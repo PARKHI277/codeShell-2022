@@ -13,6 +13,9 @@ app.use(
 );
 
 //middlewares
+app.get("/", (req, res) => {
+  res.send("Hi,the API is working.");
+});
 app.use("/api/users", UserRouter);
 
 const port = process.env.PORT || 3000;
