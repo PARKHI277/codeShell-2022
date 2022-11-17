@@ -9,7 +9,7 @@ const cookieparser = require("cookie-parser");
 
 const db = require("../config/dbconfig");
 
-router.post("/register", async (req, res) => {
+router.post("/register", async ({ body }, res) => {
   try {
     const {
       name,
@@ -22,7 +22,7 @@ router.post("/register", async (req, res) => {
       gender,
       hackerId,
       isHosteler,
-    } = req.body;
+    } = body;
     const userExist = await User.findOne({
       $or: [{ rollNum }, { mobileNum }, { email }, { studentNum }],
     });
