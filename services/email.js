@@ -1,7 +1,7 @@
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
-const sendEmail = function sendEmail(to, subject, text) {
+const sendEmail = function sendEmail(to, username) {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -13,24 +13,13 @@ const sendEmail = function sendEmail(to, subject, text) {
   const mailOptions = {
     from: process.env.AUTHEREMAIL,
     to: to,
-    subject: "CodeShell Registration",
-    attachments: [
-      {
-        filname: "cine.jpeg",
-        path: "./cine.jpeg",
-      },
-    ],
-    text: `Team CSI congratulates you on successfully registering for CODESHELL 3.0. Get ready to experience enthusiasm at full throttle and show your coding skills among others at this exciting event.
-
-Mode:- Offline
-Date:- 24th November, 2022
-Time:- 4pm - 6pm
-Venue:- IT Labs
-For more information, stay tuned on our Instagram page.
-https://www.instagram.com/csi_akgec/
-
-Regards,
-Team CSI`,
+    subject: "CodeShell 3.0 Registration",
+    html: `<img src="cid:unique@kreata.ee"/><p>Greetings ${username}, <br><br><b>Team CSI</b> congratulates you on successfully registering for CODESHELL 3.0. Get ready to experience enthusiasm at full throttle and show your coding skills among others at this exciting event.<br><br><b>Mode:- Offline<br>Date:- 24th November, 2022<br>Time:- 4pm onwards<br>Venue:- IT Labs</b><br><br>For more information, stay tuned on our Instagram page.<br>https://www.instagram.com/csi_akgec/<br><br>Regards,<br>Team CSI</p>`,
+    attachments: [{
+      filname: "codeshell3.0.jpeg",
+      path: "./codeshell3.0.jpeg",
+        cid: 'unique@kreata.ee'}
+    ]
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {

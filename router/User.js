@@ -41,7 +41,7 @@ router.post("/register", async ({ body }, res) => {
 
     const saveUser = await userCreate.save();
 
-    SendEmail(saveUser.email);
+    SendEmail(saveUser.email,saveUser.name);
     res.status(201).send({
       message: "User Successfully Registered",
       id: saveUser._id,
