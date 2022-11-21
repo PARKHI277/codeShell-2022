@@ -3,7 +3,7 @@ const express = require("express");
 
 const router = new express.Router();
 const User = require("../models/Users");
-const SendEmail = require("../services/email")
+const SendEmail = require("../services/email");
 router.post("/register", async ({ body }, res) => {
   try {
     const {
@@ -40,9 +40,8 @@ router.post("/register", async ({ body }, res) => {
     });
 
     const saveUser = await userCreate.save();
-    const subject = ``;
-   const text = ``;
-    SendEmail(saveUser.email,subject,text);
+
+    SendEmail(saveUser.email);
     res.status(201).send({
       message: "User Successfully Registered",
       id: saveUser._id,
