@@ -16,8 +16,8 @@ const sendEmail = function sendEmail(to, username) {
     subject: "CodeShell 3.0 Registration",
     html: `<img src="cid:unique@kreata.ee"/><p>Greetings ${username}, <br><br><b>Team CSI</b> congratulates you on successfully registering for CODESHELL 3.0. Get ready to experience enthusiasm at full throttle and show your coding skills among others at this exciting event.<br><br><b>Mode:- Offline<br>Date:- 24th November, 2022<br>Time:- 4pm onwards<br>Venue:- IT Labs</b><br><br>For more information, stay tuned on our Instagram page.<br>https://www.instagram.com/csi_akgec/<br><br>Regards,<br>Team CSI</p>`,
     attachments: [{
-      filname: "codeshell3.0.jpeg",
-      path: "./codeshell3.0.jpeg",
+      filname: "codeshell.png",
+      path: "./codeshell.png",
         cid: 'unique@kreata.ee'}
     ]
   };
