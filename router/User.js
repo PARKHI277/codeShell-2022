@@ -11,13 +11,13 @@ async function validateHuman(token) {
   const secret = process.env.SECRET_KEY;
   console.log(secret);
   console.log(token);
-  const verifyUrl=`https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
-  request(verifyUrl,(err,response,body)=>{
-    body=JSON.parse(body);
-  
-   console.log(body.success);
-   return body.success;
-    });
+  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
+  request(verifyUrl, (err, response, body) => {
+    body = JSON.parse(body);
+
+    console.log(body.success);
+    return body.success;
+  });
   // const response=await axios.post(
   //   `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`,
   //   {},
@@ -41,57 +41,65 @@ router.post("/register", async ({ body }, res) => {
     //   console.log(count); }
     // );
     // console.log(total);
-    const {
-      name,
-      email,
-      studentNum,
-      rollNum,
-      mobileNum,
-      year,
-      branch,
-      gender,
-      hackerId,
-      isHosteler,
-      token
-    } = body;
-    if( token === undefined ||token==="" || token===null)
-return res.status(200).send({"msg":"Token validation failed"});
-const human = await validateHuman(token);
-if (!human) {
-  res.status(400);
-  res.json({ errors: ["err"] });
-  return;
-}
+    const total_registration = await User.find().countDocuments();
+    console.log(total_registration);
+    if (total_registration > 500) {
+      res.status(400).send({
+        message: "Registration Full",
+      });
+    } else {
+      const {
+        name,
+        email,
+        studentNum,
+        rollNum,
+        mobileNum,
+        year,
+        branch,
+        gender,
+        hackerId,
+        isHosteler,
+        token,
+      } = body;
+      if (token === undefined || token === "" || token === null)
+        return res.status(200).send({ msg: "Token validation failed" });
+      const human = await validateHuman(token);
+      if (!human) {
+        res.status(400);
+        res.json({ errors: ["err"] });
+        return;
+      }
 
-    const userExist = await User.findOne({
-      $or: [{ rollNum }, { mobileNum }, { email }, { studentNum }],
-    });
+      const userExist = await User.findOne({
+        $or: [{ rollNum }, { mobileNum }, { email }, { studentNum }],
+      });
 
-    if (userExist) {
-      return res.status(406).send({ msg: "User already exists" });
+      if (userExist) {
+        return res.status(406).send({ msg: "User already exists" });
+      }
+
+      const userCreate = new User({
+        name,
+        email,
+        studentNum,
+        rollNum,
+        mobileNum,
+        year,
+        branch,
+        gender,
+        hackerId,
+        isHosteler,
+        token,
+      });
+
+      const saveUser = await userCreate.save();
+
+      SendEmail(saveUser.email, saveUser.name);
+      res.status(201).send({
+        message: "User Successfully Registered",
+        id: saveUser._id,
+      });
     }
-
-    const userCreate = new User({
-      name,
-      email,
-      studentNum,
-      rollNum,
-      mobileNum,
-      year,
-      branch,
-      gender,
-      hackerId,
-      isHosteler,
-      token
-    });
-
-    const saveUser = await userCreate.save();
-
-    SendEmail(saveUser.email, saveUser.name);
-    res.status(201).send({
-      message: "User Successfully Registered",
-      id: saveUser._id,
-    });
   } catch (error) {
     res.status(400).send(`err ${error}`);
   }
