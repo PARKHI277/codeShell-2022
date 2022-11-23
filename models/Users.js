@@ -21,7 +21,7 @@ const UserSchema = new Schema(
       required: [true, "Roll Number is required"],
       unique: true,
       minLength: [13, "min length is 13"],
-      maxLength: [13, "max length is 13"]
+      maxLength: [13, "max length is 13"],
     },
     mobileNum: {
       type: Number,
@@ -51,14 +51,13 @@ const UserSchema = new Schema(
       required: true,
     },
     hackerId: {
-      type: String
+      type: String,
+      require: [true, "HackerRank Id is required"],
     },
-   captcha_token: {
-      type: String},
     isVerified: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   { timestamps: true }
 );
