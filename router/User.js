@@ -7,30 +7,32 @@ const User = require("../models/Users");
 const SendEmail = require("../services/email");
 const { default: mongoose } = require("mongoose");
 
-async function validateHuman(token) {
+const validateHuman = async (token) => {
   const secret = process.env.SECRET_KEY;
   console.log(secret);
   console.log(token);
-  const verifyUrl=`https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
-  request(verifyUrl,(err,response,body)=>{
-    body=JSON.parse(body);
-  
-   console.log(body.success);
-   return body.success;
-    });
-  // const response=await axios.post(
-  //   `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`,
-  //   {},
-  //   {
-  //     headers: {
-  //       "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-  //     },
-  //   },
-  // ).then((res)=>{console.log(res.data);});
+  // const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
+  // request(verifyUrl, (err, response, body) => {
+  //   body = JSON.parse(body);
+  //   console.log(body.success);
+  //   return body.success;
+  // });
+  let data;
+  await axios.post(
+    `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`,
+    // {},
+    // {
+    //   headers: {
+    //     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+    //   },
+    // },
+  ).then((res) => { console.log(res.data);
+  data = res.data })
+    .catch((err) => console.log(err));
   // const data = await response.data;
   // console.log(response.data);
   // console.log(response.data.success);
-  // return data.success;
+  return data.success;
 }
 
 router.post("/register", async ({ body }, res) => {
@@ -54,14 +56,15 @@ router.post("/register", async ({ body }, res) => {
       isHosteler,
       token
     } = body;
-    if( token === undefined ||token==="" || token===null)
-return res.status(200).send({"msg":"Token validation failed"});
-const human = await validateHuman(token);
-if (!human) {
-  res.status(400);
-  res.json({ errors: ["err"] });
-  return;
-}
+    if (!token)
+      return res.status(200).send({ "msg": "Token validation failed" });
+    const human = validateHuman(token);
+    console.log(human);
+    if (!human) {
+      res.status(400);
+      res.json({ errors: ["err"] });
+      return;
+    }
 
     const userExist = await User.findOne({
       $or: [{ rollNum }, { mobileNum }, { email }, { studentNum }],
