@@ -5,7 +5,7 @@ mongoose
     process.env.DB_URL,
 
     {
-      useNewUrlParser: true,
+      useNewUrlParser: true,useUnifiedTopology:true
     }
   )
   .then(() => {
