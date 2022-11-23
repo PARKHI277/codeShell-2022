@@ -88,7 +88,6 @@ router.post("/register", async ({ body }, res) => {
         gender,
         hackerId,
         isHosteler,
-        token,
       });
 
       const saveUser = await userCreate.save();
