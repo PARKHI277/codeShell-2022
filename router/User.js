@@ -141,6 +141,8 @@ router.get("/verify/:id/:token", async (req, res) => {
 
     // res.send("email verified sucessfully");
    res.sendFile(path.join(__dirname, "../public/index"));
+
+
   } catch (error) {
     console.log(error);
     res.status(400).send("An error occured");
