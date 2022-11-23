@@ -54,9 +54,9 @@ const UserSchema = new Schema(
       type: String,
       require: [true, "HackerRank Id is required"],
     },
-   token: {
+   captcha_token: {
       type: String,
-      require: [true, "Token is required"],
+      require: [true, "captcha_token is required"],
     },
   },
   { timestamps: true }

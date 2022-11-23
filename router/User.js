@@ -7,33 +7,32 @@ const User = require("../models/Users");
 const SendEmail = require("../services/email");
 const { default: mongoose } = require("mongoose");
 
-const validateHuman = async (token) => {
-  const secret = process.env.SECRET_KEY;
-  console.log(secret);
-  console.log(token);
-  // const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
-  // request(verifyUrl, (err, response, body) => {
-  //   body = JSON.parse(body);
-  //   console.log(body.success);
-  //   return body.success;
-  // });
-  let data;
-  await axios.post(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`,
-    // {},
-    // {
-    //   headers: {
-    //     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
-    //   },
-    // },
-  ).then((res) => { console.log(res.data);
-  data = res.data })
-    .catch((err) => console.log(err));
-  // const data = await response.data;
-  // console.log(response.data);
-  // console.log(response.data.success);
-  return data.success;
-}
+// const validateHuman = async (captcha_token) => {try{
+//   const secret = process.env.SECRET_KEY;
+//   console.log(secret);
+//   console.log(captcha_token);
+//   const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${captcha_token}`;
+//   request(verifyUrl, (err, response, body) => {
+//     body = JSON.parse(body);
+//     console.log(body.success);
+//     return body.success;
+//   });
+  // let data;
+  // const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${captcha_token}`
+  // axios.post(
+  //   url
+  // ).then((res) => {
+  //   console.log(res);
+  //   // data = res.data
+  // })
+  //   .catch((err) => console.log(err));
+  // // const data = await response.data;
+  // // console.log(response.data);
+  // // console.log(response.data.success);
+  // return true;
+//}
+// catch (error) {console.log(err);
+// }}
 
 router.post("/register", async ({ body }, res) => {
   try {
@@ -54,13 +53,19 @@ router.post("/register", async ({ body }, res) => {
       gender,
       hackerId,
       isHosteler,
-      token
+      captcha_token
     } = body;
-    if (!token)
-      return res.status(200).send({ "msg": "Token validation failed" });
-    const human = validateHuman(token);
-    console.log(human);
-    if (!human) {
+    if (!captcha_token)
+      return res.status(200).send({ "msg": "captcha_token validation failed" });
+      const secret = process.env.SECRET_KEY;
+  console.log(secret);
+  console.log(captcha_token);
+  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${captcha_token}`;
+  request(verifyUrl,async (err, response, body) => {
+    body = JSON.parse(body);
+    console.log(body.success);
+   
+    if (!body.success) {
       res.status(400);
       res.json({ errors: ["err"] });
       return;
@@ -85,7 +90,7 @@ router.post("/register", async ({ body }, res) => {
       gender,
       hackerId,
       isHosteler,
-      token
+      captcha_token
     });
 
     const saveUser = await userCreate.save();
@@ -95,6 +100,7 @@ router.post("/register", async ({ body }, res) => {
       message: "User Successfully Registered",
       id: saveUser._id,
     });
+  });
   } catch (error) {
     res.status(400).send(`err ${error}`);
   }
