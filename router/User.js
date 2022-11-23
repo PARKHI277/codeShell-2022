@@ -6,6 +6,15 @@ const router = new express.Router();
 const User = require("../models/Users");
 const SendEmail = require("../services/email");
 const { default: mongoose } = require("mongoose");
+const crypto = require("crypto");
+const Token = require("../models/token");
+// async function validateHuman(token) {
+//   const secret = process.env.SECRET_KEY;
+//   console.log(secret);
+//   console.log(token);
+//   const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
+//   request(verifyUrl, (err, response, body) => {
+//     body = JSON.parse(body);
 
 // const validateHuman = async (captcha_token) => {try{
 //   const secret = process.env.SECRET_KEY;
@@ -66,17 +75,75 @@ router.post("/register", async ({ body }, res) => {
     console.log(body.success);
    
     if (!body.success) {
-      res.status(400);
+      res.status(403);
       res.json({ errors: ["err"] });
       return;
     }
+    const total_registration = await User.find().countDocuments();
+    console.log(total_registration);
+    if (total_registration > 500) {
+      res.status(400).send({
+        message: "Registration Full",
+      });
+    } else {
+      const {
+        name,
+        email,
+        studentNum,
+        rollNum,
+        mobileNum,
+        year,
+        branch,
+        gender,
+        hackerId,
+        isHosteler,
+      } = body;
+      // if (token === undefined || token === "" || token === null)
+      //   return res.status(200).send({ msg: "Token validation failed" });
+      // const human = await validateHuman(token);
+      // if (!human) {
+      //   res.status(400);
+      //   res.json({ errors: ["err"] });
+      //   return;
+      // }
 
-    const userExist = await User.findOne({
-      $or: [{ rollNum }, { mobileNum }, { email }, { studentNum }],
-    });
+      const userExist = await User.findOne({
+        $or: [{ rollNum }, { mobileNum }, { email }, { studentNum }],
+      });
 
-    if (userExist) {
-      return res.status(406).send({ msg: "User already exists" });
+      if (userExist) {
+        return res.status(406).send({ msg: "User already exists" });
+      }
+
+      const userCreate = new User({
+        name,
+        email,
+        studentNum,
+        rollNum,
+        mobileNum,
+        year,
+        branch,
+        gender,
+        hackerId,
+        isHosteler,
+      });
+
+      const saveUser = await userCreate.save();
+
+      // generating token
+      let token = await new Token({
+        userId: userCreate._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+
+      const message = `${process.env.BASE_URL}/users/verify/${userCreate.id}/${token.token}`;
+      console.log(message);
+
+      SendEmail(saveUser.email, saveUser.name, message);
+      res.status(201).send({
+        message: "User Successfully Registered",
+        id: saveUser._id,
+      });
     }
 
     const userCreate = new User({
@@ -103,6 +170,34 @@ router.post("/register", async ({ body }, res) => {
   });
   } catch (error) {
     res.status(400).send(`err ${error}`);
+  }
+});
+
+router.get("/verify/:id/:token", async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+    console.log(user);
+    if (!user) return res.status(400).send("Invalid link");
+
+    const token = await Token.findOne({
+      userId: user._id,
+      token: req.params.token,
+    });
+    console.log(token);
+    if (!token) return res.status(400).send("Invalid link");
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: {
+        isVerified: true,
+      },
+    });
+
+    await Token.findByIdAndRemove(token._id);
+
+    res.send("email verified sucessfully");
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("An error occured");
   }
 });
 

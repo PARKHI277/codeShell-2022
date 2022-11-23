@@ -56,7 +56,10 @@ const UserSchema = new Schema(
     },
    captcha_token: {
       type: String,
-      require: [true, "captcha_token is required"],
+      require: [true, "captcha_token is required"]},
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
