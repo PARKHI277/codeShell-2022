@@ -54,10 +54,6 @@ const UserSchema = new Schema(
       type: String,
       require: [true, "HackerRank Id is required"],
     },
-   token: {
-      type: String,
-      require: [true, "Token is required"],
-    },
   },
   { timestamps: true }
 );
