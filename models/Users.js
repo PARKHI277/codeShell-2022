@@ -54,6 +54,10 @@ const UserSchema = new Schema(
       type: String,
       require: [true, "HackerRank Id is required"],
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
