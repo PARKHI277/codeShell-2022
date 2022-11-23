@@ -6,7 +6,6 @@ const router = new express.Router();
 const User = require("../models/Users");
 const SendEmail = require("../services/email");
 const { default: mongoose } = require("mongoose");
-const Token = require("../models/token");
 const crypto = require("crypto");
 
 // async function validateHuman(token) {
