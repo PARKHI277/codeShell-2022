@@ -6,6 +6,8 @@ const router = new express.Router();
 const User = require("../models/Users");
 const SendEmail = require("../services/email");
 const { default: mongoose } = require("mongoose");
+const Token = require("../models/token");
+const crypto = require("crypto");
 
 // async function validateHuman(token) {
 //   const secret = process.env.SECRET_KEY;
@@ -91,8 +93,15 @@ router.post("/register", async ({ body }, res) => {
       });
 
       const saveUser = await userCreate.save();
+      let token = await new Token({
+        userId: userCreate._id,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
 
-      SendEmail(saveUser.email, saveUser.name);
+      const message = `${process.env.BASE_URL}/users/verify/${userCreate.id}/${token.token}`;
+      console.log(message);
+
+      SendEmail(saveUser.email, saveUser.name, message);
       res.status(201).send({
         message: "User Successfully Registered",
         id: saveUser._id,
@@ -100,6 +109,26 @@ router.post("/register", async ({ body }, res) => {
     }
   } catch (error) {
     res.status(400).send(`err ${error}`);
+  }
+});
+
+router.get("/verify/:id/:token", async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user) return res.status(400).send("Invalid link");
+
+    const token = await Token.findOne({
+      userId: user._id,
+      token: req.params.token,
+    });
+    if (!token) return res.status(400).send("Invalid link");
+
+    await User.updateOne({ _id: user._id, isVerified: true });
+    await Token.findByIdAndRemove(token._id);
+
+    res.send("email verified sucessfully");
+  } catch (error) {
+    res.status(400).send("An error occured");
   }
 });
 
