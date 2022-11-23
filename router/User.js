@@ -68,7 +68,7 @@ router.post("/register", async ({ body }, res) => {
   console.log(message);
     const saveUser = await userCreate.save();
 
-    SendEmail(saveUser.email, saveUser.name);
+    SendEmail(saveUser.email, saveUser.name,message);
     res.status(201).send({
       message: "User Successfully Registered",
       id: saveUser._id,
@@ -83,7 +83,7 @@ router.get("/verify/:id/:token", async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
     console.log(user);
-    if (!user) return res.status(400).send("Invalid link");
+    if (!user) return res.status(400).send("User not found");
 
     const token = await Token.findOne({
       userId: user._id,
