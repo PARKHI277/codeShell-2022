@@ -91,7 +91,7 @@ router.post("/register", async ({ body }, res) => {
         isHosteler,
       });
 
-      // const saveUser = await userCreate.save();
+      const saveUser = await userCreate.save();
       // let token = await new Token({
       //   userId: userCreate._id,
       //   token: crypto.randomBytes(32).toString("hex"),
