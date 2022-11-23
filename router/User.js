@@ -92,14 +92,14 @@ router.post("/register", async ({ body }, res) => {
         isHosteler,
       });
 
-      const saveUser = await userCreate.save();
-      let token = await new Token({
-        userId: userCreate._id,
-        token: crypto.randomBytes(32).toString("hex"),
-      }).save();
+      // const saveUser = await userCreate.save();
+      // let token = await new Token({
+      //   userId: userCreate._id,
+      //   token: crypto.randomBytes(32).toString("hex"),
+      // }).save();
 
-      const message = `${process.env.BASE_URL}/users/verify/${userCreate.id}/${token.token}`;
-      console.log(message);
+      // const message = `${process.env.BASE_URL}/users/verify/${userCreate.id}/${token.token}`;
+      // console.log(message);
 
       SendEmail(saveUser.email, saveUser.name, message);
       res.status(201).send({
@@ -112,24 +112,24 @@ router.post("/register", async ({ body }, res) => {
   }
 });
 
-router.get("/verify/:id/:token", async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req.params.id });
-    if (!user) return res.status(400).send("Invalid link");
+// router.get("/verify/:id/:token", async (req, res) => {
+//   try {
+//     const user = await User.findOne({ _id: req.params.id });
+//     if (!user) return res.status(400).send("Invalid link");
 
-    const token = await Token.findOne({
-      userId: user._id,
-      token: req.params.token,
-    });
-    if (!token) return res.status(400).send("Invalid link");
+//     const token = await Token.findOne({
+//       userId: user._id,
+//       token: req.params.token,
+//     });
+//     if (!token) return res.status(400).send("Invalid link");
 
-    await User.updateOne({ _id: user._id, isVerified: true });
-    await Token.findByIdAndRemove(token._id);
+//     await User.updateOne({ _id: user._id, isVerified: true });
+//     await Token.findByIdAndRemove(token._id);
 
-    res.send("email verified sucessfully");
-  } catch (error) {
-    res.status(400).send("An error occured");
-  }
-});
+//     res.send("email verified sucessfully");
+//   } catch (error) {
+//     res.status(400).send("An error occured");
+//   }
+// });
 
 module.exports = router;
