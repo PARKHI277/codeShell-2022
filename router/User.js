@@ -8,6 +8,11 @@ const SendEmail = require("../services/email");
 const { default: mongoose } = require("mongoose");
 const crypto = require("crypto");
 const Token = require("../models/token");
+const path = require("path");
+
+const staticPath = path.join(__dirname, "../public");
+console.log(path.join(__dirname, "../public"));
+router.use(express.static(staticPath));
 // async function validateHuman(token) {
 //   const secret = process.env.SECRET_KEY;
 //   console.log(secret);
@@ -135,7 +140,7 @@ router.get("/verify/:id/:token", async (req, res) => {
     await Token.findByIdAndRemove(token._id);
 
     // res.send("email verified sucessfully");
-    res.sendFile("./index.html");
+   res.sendFile(path.join(__dirname, "../public/index"));
   } catch (error) {
     console.log(error);
     res.status(400).send("An error occured");

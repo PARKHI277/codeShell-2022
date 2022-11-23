@@ -11,6 +11,7 @@ app.use(
     origin: "*",
   })
 );
+app.use(express.static(__dirname));
 
 //middlewares
 app.get("/", (req, res) => {
