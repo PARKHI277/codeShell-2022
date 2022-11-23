@@ -100,7 +100,7 @@ router.post("/register", async ({ body }, res) => {
       // const message = `${process.env.BASE_URL}/users/verify/${userCreate.id}/${token.token}`;
       // console.log(message);
 
-      SendEmail(saveUser.email, saveUser.name, message);
+      SendEmail(saveUser.email, saveUser.name);
       res.status(201).send({
         message: "User Successfully Registered",
         id: saveUser._id,
