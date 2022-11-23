@@ -134,7 +134,8 @@ router.get("/verify/:id/:token", async (req, res) => {
 
     await Token.findByIdAndRemove(token._id);
 
-    res.send("email verified sucessfully");
+    // res.send("email verified sucessfully");
+    res.sendFile("./index.html");
   } catch (error) {
     console.log(error);
     res.status(400).send("An error occured");
